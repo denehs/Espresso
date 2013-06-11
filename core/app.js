@@ -718,7 +718,8 @@ App.prototype.buildDefFile = function (callback) {
     _frameworkOptions.virtual = true;
     _frameworkOptions.frDelimiter = '/';
     _frameworkOptions.taskChain = new TaskManager([
-        "void"
+        "contentType",
+        "manifest"
     ]).getTaskChain();
     var fr = new Framework(_frameworkOptions);
     fr.files.push(new File({
@@ -765,7 +766,8 @@ App.prototype.buildConfigFile = function (callback) {
     _frameworkOptions.virtual = true;
     _frameworkOptions.frDelimiter = '/';
     _frameworkOptions.taskChain = new TaskManager([
-        "void"
+        "contentType",
+        "manifest"
     ]).getTaskChain();
     var fr = new Framework(_frameworkOptions);
     fr.files.push(new File({
@@ -792,7 +794,8 @@ App.prototype.buildExecFile = function (callback) {
     _frameworkOptions.virtual = true;
     _frameworkOptions.frDelimiter = '/';
     _frameworkOptions.taskChain = new TaskManager([
-        "void"
+        "contentType",
+        "manifest"
     ]).getTaskChain();
     var fr = new Framework(_frameworkOptions);
     fr.files.push(new File({
@@ -988,21 +991,15 @@ App.prototype.build = function (callback) {
 
   /*
    *  Build stack:
-   *  1) Build the application
-   *   11) Build each framework
-   *  2) Build def.js, config.js and exec.js
+   *  1) Build def.js, config.js and exec.js
+   *  2) Build the application
+   *   21) Build each framework
    *  3) Build the index.html
    *  4) Build the cache manifest, after all frameworks had been built.
    *  5) Call callback, which leads to the next step of the build OR server
    *     process.
    */
   self.sequencer(
-      function () {
-        console.log(self.style.green('Building application: "')
-          + self.style.magenta(self.name)
-          + self.style.green('"'));
-        new _AppBuilder(self, this).build();
-      },
       function (err, frameworks) {
           if (err) { throw err; }
           self.buildDefFile(this);
@@ -1014,6 +1011,12 @@ App.prototype.build = function (callback) {
       function (err, frameworks) {
           if (err) { throw err; }
           self.buildExecFile(this);
+      },
+      function () {
+        console.log(self.style.green('Building application: "')
+          + self.style.magenta(self.name)
+          + self.style.green('"'));
+        new _AppBuilder(self, this).build();
       },
       function (err, frameworks) {
         if (err) { throw err; }
